@@ -1,8 +1,7 @@
 const express = require('express');
 const connectDB = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
-//const authRoutes = require('./routes/authRoutes');
-const cartRoutes = require('./routes/cartItemRouter');
+const cartItemRouter = require('./routes/cartItemRouter');
 
 const app = express();
 
@@ -14,8 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/cart', cartItemRoutes);
+app.use('/api/cart', cartItemRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;

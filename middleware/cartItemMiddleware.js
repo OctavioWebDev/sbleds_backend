@@ -1,5 +1,6 @@
 const { body, validationResult } = require('express-validator');
-const CartItem = require('../models/CartItem');
+const CartItemModel = require('../models/CartItemModel');
+
 
 // Validate the request body for creating or updating a cart item
 const validateCartItem = [
