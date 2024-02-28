@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const blacklist = new Set();
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -51,12 +52,22 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  blacklist.add(token);
+  res.status(200).json({ message: 'Logged out' });
+});
+
 // Get user profile
 router.get('/profile', async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (blacklist.has(token)) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const user = await User.findById(decoded.userId);
 
