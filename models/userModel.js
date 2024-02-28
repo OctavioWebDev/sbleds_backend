@@ -19,7 +19,12 @@ const UserSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Hash the password before saving the user to the database
