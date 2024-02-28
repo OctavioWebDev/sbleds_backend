@@ -13,6 +13,12 @@ module.exports = async (req, res, next) => {
     }
 
     req.user = user;
+
+    // Check if the user is an admin, and return a 403 Forbidden status if not
+    if (req.route.path === '/admin-dashboard' && !user.isAdmin) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     next();
   } catch (error) {
     console.error(error);

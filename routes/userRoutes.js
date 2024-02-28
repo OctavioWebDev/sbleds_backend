@@ -4,6 +4,8 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const blacklist = new Set();
+const authMiddleware = require('./path/to/authMiddleware');
+const isAdmin = require('./path/to/isAdminMiddleware'); 
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -100,6 +102,30 @@ router.put('/profile', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(401).json({ message: 'Unauthorized' });
+  }
+});
+
+// Register an admin user
+router.post('/register-admin', authMiddleware, isAdmin, async (req, res) => {
+  const { username, email, password, isAdmin } = req.body;
+
+  try {
+    if (!isAdmin) {
+      return res.status(400).json({ message: 'Only admin users can be registered through this route' });
+    }
+
+    const newUser = new User({
+      username,
+      email,
+      password,
+      isAdmin,
+    });
+
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
