@@ -1,8 +1,7 @@
 const express = require('express');
 const connectDB = require('./server');
 const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
-const cartRoutes = require('./routes/cartRoutes');
+const cartItemRouter = require('./routes/cartItemRouter');
 
 // Connect to MongoDB database
 connectDB();
@@ -15,8 +14,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/cart', cartRoutes);
+app.use('/api/cart-items', cartItemRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;

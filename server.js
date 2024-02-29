@@ -13,7 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/cart', cartItemRouter);
+app.use('/api/cart-items', cartItemRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;

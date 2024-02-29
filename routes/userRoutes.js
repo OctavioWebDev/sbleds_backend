@@ -4,8 +4,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const blacklist = new Set();
-const authMiddleware = require('./path/to/authMiddleware');
-const isAdmin = require('./path/to/isAdminMiddleware'); 
+const {authMiddleware, isAdmin} = require('../middleware/authMiddleware');
 
 // Register a new user
 router.post('/register', async (req, res) => {
