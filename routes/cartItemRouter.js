@@ -6,7 +6,7 @@ const { validateCartItem, checkCartItemExists, checkCartItemUser, getCartItem } 
 const { authMiddleware } = require('../middleware/authMiddleware');
 
 //POST /cart - Add a new item to the cart
-router.post('/cart', authMiddleware, validateCartItem, async (req, res) => {
+router.post('/', authMiddleware, validateCartItem, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -23,9 +23,8 @@ router.post('/cart', authMiddleware, validateCartItem, async (req, res) => {
   }
 });
 
-
 //GET /cart - Retrieve all items in the cart
-router.get('/cart', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const cartItems = await CartItem.find({ user: req.user.id });
     res.status(200).json(cartItems);
@@ -37,7 +36,7 @@ router.get('/cart', authMiddleware, async (req, res) => {
 
 
 //PUT /cart/:id - Update an item in the cart
-router.put('/cart/:id', authMiddleware,validateCartItem, checkCartItemExists,checkCartItemUser, getCartItem, async (req, res) => {
+router.put('/:id', authMiddleware,validateCartItem, checkCartItemExists,checkCartItemUser, getCartItem, async (req, res) => {
   try {
     const { text, font, color, size, backingType, location, quantity } = req.body;
     const updatedCartItem = await CartItem.findByIdAndUpdate(
@@ -54,7 +53,7 @@ router.put('/cart/:id', authMiddleware,validateCartItem, checkCartItemExists,che
 
 
 //DELETE /cart/:id - Delete an item from the cart
-router.delete('/cart/:id', authMiddleware,checkCartItemExists, checkCartItemExists, getCartItem, async (req, res) => {
+router.delete('/', authMiddleware,checkCartItemExists, checkCartItemExists, getCartItem, async (req, res) => {
   try {
     const deletedCartItem = await CartItem.findByIdAndRemove(res.cartItem._id);
     res.status(200).json({ message: 'Cart item deleted', item: deletedCartItem });

@@ -1,5 +1,5 @@
 const { body, validationResult } = require('express-validator');
-const CartItemModel = require('../models/CartItemModel');
+const CartItem = require('../models/CartItemModel');
 
 
 // Validate the request body for creating or updating a cart item
@@ -39,20 +39,17 @@ const checkCartItemUser = (req, res, next) => {
 
 // Middleware to get a cart item by ID
 async function getCartItem(req, res, next) {
-  let cartItem;
-
   try {
-    cartItem = await CartItem.findById(req.params.id);
-
-    if (cartItem == null) {
+    const cartItem = await CartItem.findById(req.params.id);
+    if (!cartItem) {
       return res.status(404).json({ message: 'Cannot find cart item' });
     }
+    res.cartItem = cartItem; // Attach the found cartItem to the res object
+    next(); // Proceed to the next middleware
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: err.message });
   }
-
-  res.cartItem = cartItem;
-  next();
 }
 
 module.exports = {
