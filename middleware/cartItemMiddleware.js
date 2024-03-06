@@ -17,7 +17,7 @@ const validateCartItem = [
 // Check if the cart item exists in the database
 const checkCartItemExists = async (req, res, next) => {
   try {
-    const cartItem = await CartItem.findById(req.params.id);
+    const cartItem = await CartItem.findById(req.params.id).populate('user'); // Assuming you have a 'user' field to populate
     if (!cartItem) {
       return res.status(404).json({ message: 'Cart item not found' });
     }
@@ -31,11 +31,13 @@ const checkCartItemExists = async (req, res, next) => {
 
 // Check if the cart item belongs to the current user
 const checkCartItemUser = (req, res, next) => {
-  if (res.cartItem.user.toString() !== req.user.id) {
+  if (!res.cartItem || !res.cartItem.user || res.cartItem.user._id.toString() !== req.user.id.toString()) {
     return res.status(403).json({ message: 'Forbidden' });
   }
   next();
 };
+
+
 
 // Middleware to get a cart item by ID
 async function getCartItem(req, res, next) {

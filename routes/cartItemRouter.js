@@ -36,7 +36,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 
 //PUT /cart/:id - Update an item in the cart
-router.put('/:id', authMiddleware,validateCartItem, checkCartItemExists,checkCartItemUser, getCartItem, async (req, res) => {
+router.put('/:id', authMiddleware, validateCartItem, checkCartItemExists, checkCartItemUser, getCartItem, async (req, res) => {
   try {
     const { text, font, color, size, backingType, location, quantity } = req.body;
     const updatedCartItem = await CartItem.findByIdAndUpdate(
@@ -53,7 +53,7 @@ router.put('/:id', authMiddleware,validateCartItem, checkCartItemExists,checkCar
 
 
 //DELETE /cart/:id - Delete an item from the cart
-router.delete('/', authMiddleware,checkCartItemExists, checkCartItemExists, getCartItem, async (req, res) => {
+router.delete('/', authMiddleware, checkCartItemExists, getCartItem, async (req, res) => {
   try {
     const deletedCartItem = await CartItem.findByIdAndRemove(res.cartItem._id);
     res.status(200).json({ message: 'Cart item deleted', item: deletedCartItem });
