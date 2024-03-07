@@ -34,7 +34,6 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-
 //PUT /cart/:id - Update an item in the cart
 router.put('/:id', authMiddleware, validateCartItem, checkCartItemExists, checkCartItemUser, getCartItem, async (req, res) => {
   try {
@@ -51,17 +50,20 @@ router.put('/:id', authMiddleware, validateCartItem, checkCartItemExists, checkC
   }
 });
 
-
 //DELETE /cart/:id - Delete an item from the cart
-router.delete('/', authMiddleware, checkCartItemExists, getCartItem, async (req, res) => {
+router.delete('/:id', authMiddleware, checkCartItemExists, getCartItem, async (req, res) => {
+  console.log("Delete route reached for ID:", req.params.id);
   try {
-    const deletedCartItem = await CartItem.findByIdAndRemove(res.cartItem._id);
+    // Using findOneAndDelete instead
+    const deletedCartItem = await CartItem.findOneAndDelete({ _id: req.params.id });
+    if (!deletedCartItem) {
+      return res.status(404).json({ message: 'Cart item not found' });
+    }
     res.status(200).json({ message: 'Cart item deleted', item: deletedCartItem });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 module.exports = router;
