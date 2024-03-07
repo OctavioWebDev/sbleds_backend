@@ -52,7 +52,7 @@ router.put('/:id', authMiddleware, validateCartItem, checkCartItemExists, checkC
 
 //DELETE /cart/:id - Delete an item from the cart
 router.delete('/:id', authMiddleware, checkCartItemExists, getCartItem, async (req, res) => {
-  console.log("Delete route reached for ID:", req.params.id);
+
   try {
     // Using findOneAndDelete instead
     const deletedCartItem = await CartItem.findOneAndDelete({ _id: req.params.id });
