@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const validateUser = require('../middleware/validateUser');
 const auth = require('../middleware/authMiddleware');
-const bcrypt = require('bcrypt');
+const generateToken = require('./utils/generateToken');
 const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
@@ -68,18 +68,18 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      {
-        username,
-        email,
-        password: bcrypt.hashSync(password, 10)
-      },
+      { username, email, password: hashedPassword },
       { new: true }
-    );
+    ).select('-password'); // Exclude password from the response
 
-    res.status(200).json(updatedUser);
+    // Optionally regenerate token if necessary
+    const token = generateToken(updatedUser._id);
+
+    res.status(200).json({ user: updatedUser, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

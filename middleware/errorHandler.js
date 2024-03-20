@@ -1,11 +1,25 @@
 const errorHandler = (err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode);
-    res.json({
-      message: err.message,
-      stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-    });
+  // Log the error internally
+  console.error(err);
+
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode);
+
+  let response = {
+    message: err.message,
+    // Conditionally add more detailed information in non-production environments
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   };
-  
-  module.exports = errorHandler;
+
+  // Extend error handling for specific error types or codes
+  if (err.type === 'ValidationError') {
+      response.details = err.details; // Assuming err.details contains validation specifics
+      response.message = 'Validation failed';
+  }
+
+  res.json(response);
+};
+
+module.exports = errorHandler;
+
   
