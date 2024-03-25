@@ -9,6 +9,24 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.0",
-    "morgan": "^1.10.0"
-  }
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "sbleds_backend",
+  "description": "This is the backend for the led sign tool",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/babotavo419/sbleds_backend.git"
+  },
+  "author": "octavio",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/babotavo419/sbleds_backend/issues"
+  },
+  "homepage": "https://github.com/babotavo419/sbleds_backend#readme"
 }
