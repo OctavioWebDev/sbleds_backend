@@ -1,24 +1,10 @@
+const { logEvents } = require('./logEvents');
+
 const errorHandler = (err, req, res, next) => {
-  // Log the error internally
-  console.error(err);
-
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode);
-
-  let response = {
-    message: err.message,
-    // Conditionally add more detailed information in non-production environments
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
-  };
-
-  // Extend error handling for specific error types or codes
-  if (err.type === 'ValidationError') {
-      response.details = err.details; // Assuming err.details contains validation specifics
-      response.message = 'Validation failed';
-  }
-
-  res.json(response);
-};
+    logEvents(`${err.name}: ${err.message}`, 'errLog.txt');
+    console.error(err.stack)
+    res.status(500).send(err.message);
+}
 
 module.exports = errorHandler;
 

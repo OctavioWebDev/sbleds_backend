@@ -1,98 +1,32 @@
-const User = require('../models/User');
-const validateUser = require('../middleware/validateUser');
-const auth = require('../middleware/authMiddleware');
-const generateToken = require('./utils/generateToken');
-const jwt = require('jsonwebtoken');
+const User = require('../model/User');
 
-exports.register = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
+const getAllUsers = async (req, res) => {
+    const users = await User.find();
+    if (!users) return res.status(204).json({ 'message': 'No users found' });
+    res.json(users);
+}
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword
-    });
-
-    await newUser.save();
-
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h'
-    });
-
-    res.status(201).json({ token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-
+const deleteUser = async (req, res) => {
+    if (!req?.body?.id) return res.status(400).json({ "message": 'User ID required' });
+    const user = await User.findOne({ _id: req.body.id }).exec();
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+        return res.status(204).json({ 'message': `User ID ${req.body.id} not found` });
     }
+    const result = await user.deleteOne({ _id: req.body.id });
+    res.json(result);
+}
 
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+const getUser = async (req, res) => {
+    if (!req?.params?.id) return res.status(400).json({ "message": 'User ID required' });
+    const user = await User.findOne({ _id: req.params.id }).exec();
+    if (!user) {
+        return res.status(204).json({ 'message': `User ID ${req.params.id} not found` });
     }
+    res.json(user);
+}
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h'
-    });
-
-    res.status(200).json({ token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.getProfile = async (req, res) => {
-  try {
-    res.status(200).json(req.user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.updateProfile = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { username, email, password: hashedPassword },
-      { new: true }
-    ).select('-password'); // Exclude password from the response
-
-    // Optionally regenerate token if necessary
-    const token = generateToken(updatedUser._id);
-
-    res.status(200).json({ user: updatedUser, token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.deleteProfile = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.user._id);
-
-    res.status(204).send();
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+module.exports = {
+    getAllUsers,
+    deleteUser,
+    getUser
+}

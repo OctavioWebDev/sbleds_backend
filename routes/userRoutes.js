@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const blacklist = new Set();
 const {authMiddleware, isAdmin} = require('../middleware/authMiddleware');
 
