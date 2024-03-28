@@ -1,18 +1,19 @@
-require('dotenv').config(); // Ensure this is at the top
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const path = require('path'); // Add this to use the path module
+const path = require('path');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
 const { logger } = require('./middleware/logEvents');
 const errorHandler = require('./middleware/errorHandler');
+const verifyJWT = require('./middleware/VerifyJWT');
 const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
 const mongoose = require('mongoose');
 const connectDB = require('./config/database');
-const userRoutes = require('./routes/userRoutes');
-const cartItemRouter = require('./routes/cartItemRouter');
-const orderRouter = require('./routes/OrderRouter');
+// const userRoutes = require('./routes/userRoutes');
+const cartItemRouter = require('./routes/api/cartItemRouter');
+const orderRouter = require('./routes/api/OrderRouter');
 const PORT = process.env.PORT || 5000;
 
 // Connect to database
@@ -38,7 +39,7 @@ app.use('/logout', require('./routes/logout'));
 
 // API Routes
 app.use(verifyJWT);
-app.use('/api/users', userRoutes);
+// app.use('/api/users', userRoutes);
 app.use('/api/cartitems', cartItemRouter);
 app.use('/api/orders', orderRouter);
 
