@@ -1,30 +1,40 @@
+// controllers/registerController.js
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 
 const handleNewUser = async (req, res) => {
-    const { user, pwd } = req.body;
-    if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
+    const { username, email, password } = req.body; // Expecting username, email, and password
+    if (!username || !email || !password) {
+        console.error('Username, email, and password are required.');
+        return res.status(400).json({ 'message': 'Username, email, and password are required.' });
+    }
 
-    // check for duplicate usernames in the db
-    const duplicate = await User.findOne({ username: user }).exec();
-    if (duplicate) return res.sendStatus(409); //Conflict 
+    // Check for duplicate emails or usernames in the db
+    const duplicateEmail = await User.findOne({ email }).exec();
+    const duplicateUsername = await User.findOne({ username }).exec();
+    if (duplicateEmail || duplicateUsername) {
+        console.error('Duplicate email or username found:', email, username);
+        return res.sendStatus(409); // Conflict
+    }
 
     try {
-        //encrypt the password
-        const hashedPwd = await bcrypt.hash(pwd, 10);
+        // Encrypt the password
+        const hashedPwd = await bcrypt.hash(password, 10);
 
-        //create and store the new user
+        // Create and store the new user
         const result = await User.create({
-            "username": user,
-            "password": hashedPwd
+            username: username,
+            email: email,
+            password: hashedPwd
         });
 
-        console.log(result);
+        console.log('New user created:', result);
 
-        res.status(201).json({ 'success': `New user ${user} created!` });
+        res.status(201).json({ 'success': `New user ${username} created!` });
     } catch (err) {
-        res.status(500).json({ 'message': err.message });
+        console.error('Error during user registration:', err.message);
+        res.status(500).json({ 'message': 'Internal server error' });
     }
-}
+};
 
 module.exports = { handleNewUser };

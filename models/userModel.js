@@ -37,7 +37,11 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  refreshToken: String, // Ensure this field exists to save the refresh token
+  roles: {
+    type: Object,
+    default: { user: 'User' } // Default roles if any
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);
-

@@ -14,6 +14,10 @@ const connectDB = require('./config/database');
 const usersRoutes = require('./routes/api/users');
 const cartItemRouter = require('./routes/api/cartItemRouter');
 const orderRouter = require('./routes/api/OrderRouter');
+const paymentRouter = require('./routes/api/payment');
+const registerRouter = require('./routes/register');
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/api/profiles');
 const PORT = process.env.PORT || 5000;
 
 // Connect to database
@@ -30,20 +34,18 @@ app.use(credentials);
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.json());
 app.use('/', express.static(path.join(__dirname, '/public')));
-app.use('/', require('./routes/root'));
-app.use('/register', require('./routes/register'));
-app.use('/auth', require('./routes/auth'));
+app.use('/register', registerRouter);
+app.use('/auth', authRouter); // Ensure this is correctly added
 app.use('/refresh', require('./routes/refresh'));
 app.use('/logout', require('./routes/logout'));
-
-// Note: verifyJWT middleware is now applied only to specific routes that require authentication
-// Unauthenticated routes like /register, /auth, /refresh, and /logout do not use verifyJWT
 app.use('/api/users', usersRoutes);
 app.use('/api/cartitems', verifyJWT, cartItemRouter);
 app.use('/api/orders', verifyJWT, orderRouter);
+app.use('/api/payment', paymentRouter);
+app.use('/api/profiles', profileRouter);
 
-// Catchall handler for 404 errors, now logging the request that led to the 404
 app.all('*', (req, res) => {
     console.log(`404 Not Found: ${req.method} ${req.url}`);
     res.status(404);
@@ -56,7 +58,6 @@ app.all('*', (req, res) => {
     }
 });
 
-// Enhanced error handling middleware, logging the error and the request
 app.use((error, req, res, next) => {
     console.error(`Error during request ${req.method} ${req.url}:`, error);
     res.status(500).json({ message: 'Internal server error' });
@@ -66,6 +67,3 @@ mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
-
-
-

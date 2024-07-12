@@ -2,7 +2,7 @@ const User = require('../models/userModel');
 
 const getAllUsers = async (req, res) => {
     const users = await User.find();
-    if (!users) return res.status(204).json({ 'message': 'No user found.' });
+    if (!users) return res.status(204).json({ 'message': 'No users found.' });
     res.json(users);
 }
 
@@ -29,35 +29,49 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ 'message': 'ID parameter is required.' });
     }
 
-    const employee = await Employee.findOne({ _id: req.body.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ID ${req.body.id}.` });
+    const user = await User.findOne({ _id: req.body.id }).exec();
+    if (!user) {
+        return res.status(204).json({ "message": `No user matches ID ${req.body.id}.` });
     }
-    if (req.body?.firstname) employee.firstname = req.body.firstname;
-    if (req.body?.lastname) employee.lastname = req.body.lastname;
-    const result = await employee.save();
+    if (req.body?.username) user.username = req.body.username;
+    if (req.body?.email) user.email = req.body.email;
+    if (req.body?.password) user.password = req.body.password;
+    const result = await user.save();
     res.json(result);
 }
 
 const deleteUser = async (req, res) => {
-    if (!req?.body?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
+    if (!req?.body?.id) return res.status(400).json({ 'message': 'User ID required.' });
 
-    const employee = await Employee.findOne({ _id: req.body.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ID ${req.body.id}.` });
+    const user = await User.findOne({ _id: req.body.id }).exec();
+    if (!user) {
+        return res.status(204).json({ "message": `No user matches ID ${req.body.id}.` });
     }
-    const result = await employee.deleteOne(); //{ _id: req.body.id }
+    const result = await user.deleteOne(); //{ _id: req.body.id }
     res.json(result);
 }
 
 const getUser = async (req, res) => {
-    if (!req?.params?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
+    if (!req?.params?.id) return res.status(400).json({ 'message': 'User ID required.' });
 
-    const employee = await Employee.findOne({ _id: req.params.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ID ${req.params.id}.` });
+    const user = await User.findOne({ _id: req.params.id }).exec();
+    if (!user) {
+        return res.status(204).json({ "message": `No user matches ID ${req.params.id}.` });
     }
-    res.json(employee);
+    res.json(user);
+}
+
+// Add this function
+const getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.user.username }).exec();
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 }
 
 module.exports = {
@@ -65,5 +79,6 @@ module.exports = {
     createNewUser,
     updateUser,
     deleteUser,
-    getUser
+    getUser,
+    getUserProfile 
 }
